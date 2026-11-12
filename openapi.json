@@ -1,0 +1,1934 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Argip API",
+    "description": "This is a simple API for getting information about our products and placing orders.\r\n\r\nArgip API uses HTTP methods and a **RESTful** endpoint structure. The API authorization framework is **OAuth 2.0**. You send requests in JSON and the API returns JSON-formatted responses.\r\n\r\nTo start, read [how to authenticate](https://argipapi.argip.com.pl/docs/index) and the [Product object description](https://argipapi.argip.com.pl/ApiProductObjectDescription.pdf), and check out our [GitHub repositories](https://github.com/argip) for code examples.\r\n\r\nQuantities are given in pieces and prices are per 100 pieces.\r\n\r\nEach request must contain the header `Authorization: Bearer <access token>`. To test the API on this page without writing a line of code, click **Authorize**, paste your access token and use \"Try it out\".\r\n",
+    "contact": {
+      "name": "Argip IT department",
+      "email": "it@argip.com.pl"
+    },
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://argipapi.argip.com.pl/"
+    }
+  ],
+  "paths": {
+    "/v1/Categories/{id}": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Find category by ID",
+        "description": "Returns a single category with the full list of its path elements and a breadcrumb trail.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Category ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryInfoDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryInfoDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryInfoDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "List all categories",
+        "description": "Returns all categories, which together make up the whole category tree (`ParentCategoryId` links each category to its parent).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/MainCategories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "List top-level categories",
+        "description": "Returns all top-level categories.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/Customer/Info": {
+      "get": {
+        "tags": [
+          "Customer"
+        ],
+        "summary": "Customer info",
+        "description": "Returns basic information about your account: currency, credit limit and available credit, discounts, language and whether the account is in the testing phase (`TestingPhase`).\r\n\r\nIn the testing phase orders are saved as test orders and are not processed, and custom tags, product mappings, customer parts and shipping addresses are validated but not saved (the response has the field `Message`).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerInfoModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerInfoModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerInfoModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/CustomerParts/{page}/{pagesize}": {
+      "get": {
+        "tags": [
+          "CustomerParts"
+        ],
+        "summary": "Get a list of customer parts",
+        "description": "Returns one page of your customer parts.\r\n\r\nCheck the response headers after a successful response: the custom `X-Pagination` header (in JSON format) ***contains pagination information***. It is helpful when you display data in a paged table.\r\n\r\nE.g. `{\"TotalCount\":100,\"TotalPages\":50,\"PrevPageLink\":\"link to the previous page\",\"NextPageLink\":\"link to the next page\"}`; a link is an empty string when there is no previous or next page.\r\n\r\nIf you have no customer parts, the response is 404 with an empty body.",
+        "operationId": "CustomerPartsInfo",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "path",
+            "description": "Page number (0-based)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pagesize",
+            "in": "path",
+            "description": "Page size (min 1 max 1000)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerPartsModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerPartsModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerPartsModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/CustomerParts/{productId}": {
+      "get": {
+        "tags": [
+          "CustomerParts"
+        ],
+        "summary": "Find a customer part by product ID",
+        "description": "Returns a single customer part.",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CustomerParts"
+        ],
+        "summary": "Delete a customer part by product ID",
+        "description": "Returns the deleted customer part.\r\n\r\nIn the testing phase (`TestingPhase` = true, see Customer/Info) the data is validated in the same way but nothing is deleted: the response is the same model with the field `Message` set.",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "Product ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/CustomerParts": {
+      "put": {
+        "tags": [
+          "CustomerParts"
+        ],
+        "summary": "Add a new customer part or update an existing one",
+        "description": "Returns the added or updated customer part. If the part cannot be saved (e.g. incorrect product ID or empty part), the response is 404 with a `message`.\r\n\r\nIn the testing phase (`TestingPhase` = true, see Customer/Info) the data is validated in the same way but not saved: the response is the same model with the field `Message` set (`CustomerPartsId` is 0 for a new part).",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCustomerParts"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCustomerParts"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCustomerParts"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewCustomerParts"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPartsModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Order/Calculate": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Calculate the value and weight of an order",
+        "description": "Checks the availability of the items, then calculates the value and weight of the order. Call this before saving an order to find out if everything is OK.\r\n\r\nNothing is saved to the database. Use it only for checking, or just for preparing a product offer.\r\n\r\nQuantities are in pieces and prices are per 100 pieces. Items with the same product ID are combined. Quantities are rounded up to full packages; a quantity smaller than one package becomes one package without a warning.\r\n\r\n***Note.*** A maximum of 500 items can be calculated at once. An empty list or more than 500 items returns 400 with a `message`.\r\n\r\n***Warnings.*** Each response contains a list of warning messages (`WarningMessages`). Check this list before saving the order. Warning types:\r\n\r\n- 1: product not found; the item is skipped.\r\n- 2: the quantity (after rounding up to full packages) exceeds the stock level, or the stock is 0; in Calculate the item stays in the calculation with the quantity rounded up to full packages.\r\n- 3: a quantity larger than one package was rounded up to full packages (reported only when the rounded quantity does not exceed the stock level).\r\n- 5: the product is not active, is not on offer or has no valid package size; the item is skipped.\r\n\r\nType 4 (out of stock, item removed) is returned only by Order/Save.",
+        "requestBody": {
+          "description": "List of order items: product ID and quantity in pieces",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrderItem"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrderItem"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrderItem"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrderItem"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalcOrderModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalcOrderModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalcOrderModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Order/Save": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Save an order",
+        "description": "Before saving your order, the system checks and calculates the items as in Order/Calculate, with two differences: a quantity exceeding the stock level is reduced to the stock level (warning type 2), and an out-of-stock item is removed (warning type 4).\r\n\r\nThe order is saved only if at least one item remains. The response is 200 OK also when all items were rejected and nothing was saved, so check `Items` and `WarningMessages` in the response.\r\n\r\n`ExecutionDate` cannot be earlier than today (otherwise 400 with a `message`), and `ShippingAddressId` must be one of your active shipping addresses (otherwise 404 with a `message`).\r\n\r\nYou can use this method ***without any consequences*** if the field `TestingPhase` = true (see the Customer/Info method): the order is saved as a test order and is not processed.\r\n\r\n***Note.*** A maximum of 500 items can be saved in one order.\r\n\r\n***Warnings.*** Each response contains a list of warning messages. Check this list after saving.",
+        "requestBody": {
+          "description": "Your order: shipping address ID, execution date, optional customer order number and comments, and the list of items",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Order"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Order"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Order"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Order"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Products/{page}/{pagesize}/{activeonly}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Get a list of products",
+        "description": "Returns one page of the products on offer.\r\n\r\nUse the quickfilter parameter (in the query string) to filter products by name. Remember to ***URL-encode the filter value***.\r\n\r\nCheck the response headers after a successful response: the custom `X-Pagination` header (in JSON format) ***contains pagination information***. It is helpful when you display data in a paged table.\r\n\r\nE.g. `{\"TotalCount\":100,\"TotalPages\":50,\"PrevPageLink\":\"link to the previous page\",\"NextPageLink\":\"link to the next page\"}`; a link is an empty string when there is no previous or next page.\r\n\r\nIf no product matches, the response is 404 with an empty body.",
+        "operationId": "ProductInfo",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "path",
+            "description": "Page number (0-based)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pagesize",
+            "in": "path",
+            "description": "Page size (min 1 max 1000)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "activeonly",
+            "in": "path",
+            "description": "true: only active products; false: active and inactive products (in both cases only products on offer)",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "quickfilter",
+            "in": "query",
+            "description": "(optional) e.g. DIN 931 M8x80",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/Products/{id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Find a product by ID",
+        "description": "Returns a single product.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Product ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Products/Category/{categoryid}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "List products in a category",
+        "parameters": [
+          {
+            "name": "categoryid",
+            "in": "path",
+            "description": "Category ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Products/BaseProduct/{baseproductid}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "List products of a base product",
+        "description": "Some of our products come in more than one packing unit. Use this method to check whether there are other packing units of the same product.",
+        "parameters": [
+          {
+            "name": "baseproductid",
+            "in": "path",
+            "description": "Base product ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductModel"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Products/Ean/{ean}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Find a product by EAN barcode",
+        "description": "Returns a single product. The EAN barcode of a single package is searched first, then the EAN barcode of a multi-pack.",
+        "parameters": [
+          {
+            "name": "ean",
+            "in": "path",
+            "description": "Product EAN barcode",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Products/YourIndex/{index}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Find a product by your index",
+        "description": "Returns a single product found by your custom index (set with PUT Products).",
+        "parameters": [
+          {
+            "name": "index",
+            "in": "path",
+            "description": "Your custom index",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/CustomTag": {
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Add or update a custom tag of a product",
+        "description": "Adds a custom tag of the given type to a product, or updates its value if the product already has a tag of this type. Call it once for each tag you need. The product must be active and on offer.\r\n\r\nIn the testing phase (`TestingPhase` = true, see Customer/Info) the data is validated in the same way but not saved: the response is the same model with the field `Message` set.",
+        "requestBody": {
+          "description": "Custom tag to add to the specified product",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapCustomTag"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapCustomTag"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapCustomTag"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapCustomTag"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/Products": {
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "summary": "Update your custom fields of a product",
+        "description": "Sets your custom index, product name and EAN barcode of a product. All three fields are overwritten with the values sent (a field left out is cleared). The product must be active and on offer.\r\n\r\nIn the testing phase (`TestingPhase` = true, see Customer/Info) the data is validated in the same way but not saved: the response is the same model with the field `Message` set.",
+        "requestBody": {
+          "description": "Your custom data for the specified product",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapProduct"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapProduct"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapProduct"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapProduct"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/ShippingAddress/{page}/{pagesize}": {
+      "get": {
+        "tags": [
+          "ShippingAddresses"
+        ],
+        "summary": "Get a list of shipping addresses",
+        "description": "Returns one page of your active shipping addresses, sorted by friendly name.\r\n\r\nCheck the response headers after a successful response: the custom `X-Pagination` header (in JSON format) ***contains pagination information***. It is helpful when you display data in a paged table.\r\n\r\nE.g. `{\"TotalCount\":100,\"TotalPages\":50,\"PrevPageLink\":\"link to the previous page\",\"NextPageLink\":\"link to the next page\"}`; a link is an empty string when there is no previous or next page.\r\n\r\nIf you have no active shipping addresses, the response is 404 with an empty body.",
+        "operationId": "ShippingAddressesInfo",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "path",
+            "description": "Page number (0-based)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pagesize",
+            "in": "path",
+            "description": "Page size (min 1 max 1000)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ShippingAddressModel"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ShippingAddressModel"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ShippingAddressModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/v1/ShippingAddress/{id}": {
+      "get": {
+        "tags": [
+          "ShippingAddresses"
+        ],
+        "summary": "Find a shipping address by ID",
+        "description": "Returns a single active shipping address.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Shipping address ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingAddressModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingAddressModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingAddressModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/v1/ShippingAddress": {
+      "put": {
+        "tags": [
+          "ShippingAddresses"
+        ],
+        "summary": "Add a new shipping address",
+        "description": "Returns the added shipping address.\r\n\r\nThe country code and e-mail address are always validated; for addresses in Poland (`CountryCode` = PL) also the postal code and phone number. If the address is rejected, the response is 404 with a `message`.\r\n\r\nIn the testing phase (`TestingPhase` = true, see Customer/Info) the data is validated in the same way but not saved: the response is the same model with the field `Message` set and `ShippingAddressId` = 0.",
+        "requestBody": {
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewShippingAddress"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewShippingAddress"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewShippingAddress"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewShippingAddress"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingAddressModel"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingAddressModel"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingAddressModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CalcOrderModel": {
+        "type": "object",
+        "properties": {
+          "TotalWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "TotalNetValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "TotalGrossValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "TaxValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "CurrencyName": {
+            "type": "string"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderModelItem"
+            }
+          },
+          "WarningMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WarningMessage"
+            }
+          }
+        }
+      },
+      "CategoryDto": {
+        "type": "object",
+        "properties": {
+          "CategoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ParentCategoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Name": {
+            "type": "string"
+          }
+        }
+      },
+      "CategoryInfoDto": {
+        "type": "object",
+        "properties": {
+          "CategoryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "BreadcrumbsTrail": {
+            "type": "string"
+          },
+          "PathElements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryDto"
+            }
+          }
+        }
+      },
+      "CustomerInfoModel": {
+        "type": "object",
+        "properties": {
+          "CreditLimit": {
+            "type": "number",
+            "format": "double"
+          },
+          "CreditAvailable": {
+            "type": "number",
+            "format": "double"
+          },
+          "CurrencyName": {
+            "type": "string"
+          },
+          "Discount": {
+            "type": "number",
+            "format": "double"
+          },
+          "ExtraDiscount": {
+            "type": "number",
+            "format": "double"
+          },
+          "TestingPhase": {
+            "type": "boolean"
+          },
+          "Language": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerPartsModel": {
+        "type": "object",
+        "properties": {
+          "CustomerPartsId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ProductId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Part": {
+            "type": "string"
+          },
+          "Descrption": {
+            "type": "string"
+          },
+          "Message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CustomTagModel": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Value": {
+            "type": "string"
+          }
+        }
+      },
+      "MapCustomTag": {
+        "required": [
+          "ProductId",
+          "TagType",
+          "TagValue"
+        ],
+        "type": "object",
+        "properties": {
+          "ProductId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TagType": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TagValue": {
+            "maxLength": 50,
+            "type": "string"
+          }
+        }
+      },
+      "MapProduct": {
+        "required": [
+          "ProductId"
+        ],
+        "type": "object",
+        "properties": {
+          "ProductId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "EanBarcode": {
+            "maxLength": 50,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ProductFullName": {
+            "maxLength": 250,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "Index": {
+            "maxLength": 50,
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "NewCustomerParts": {
+        "required": [
+          "Part",
+          "ProductId"
+        ],
+        "type": "object",
+        "properties": {
+          "Part": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "Description": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ProductId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "NewShippingAddress": {
+        "required": [
+          "FiendlyName",
+          "PostalCode",
+          "Street",
+          "BuildingNumber",
+          "City",
+          "CountryCode",
+          "ContactPhone",
+          "ContactPerson"
+        ],
+        "type": "object",
+        "properties": {
+          "FiendlyName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "PostalCode": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string"
+          },
+          "Street": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "BuildingNumber": {
+            "maxLength": 10,
+            "minLength": 0,
+            "type": "string"
+          },
+          "City": {
+            "maxLength": 30,
+            "minLength": 0,
+            "type": "string"
+          },
+          "CountryCode": {
+            "maxLength": 2,
+            "minLength": 0,
+            "type": "string"
+          },
+          "ContactPhone": {
+            "maxLength": 20,
+            "minLength": 0,
+            "type": "string"
+          },
+          "ContactPerson": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "ReceivingCompanyName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "Email": {
+            "maxLength": 250,
+            "minLength": 0,
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "Order": {
+        "required": [
+          "ShippingAddressId",
+          "ExecutionDate"
+        ],
+        "type": "object",
+        "properties": {
+          "ShippingAddressId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CustomerOrderNumber": {
+            "maxLength": 30,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "ExecutionDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Comments": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            }
+          }
+        }
+      },
+      "OrderItem": {
+        "required": [
+          "ProductId",
+          "QuantityInPieces"
+        ],
+        "type": "object",
+        "properties": {
+          "ProductId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "QuantityInPieces": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "OrderModel": {
+        "type": "object",
+        "properties": {
+          "ShippingAddress": {
+            "$ref": "#/components/schemas/ShippingAddressModel"
+          },
+          "CustomerOrderNumber": {
+            "type": "string"
+          },
+          "ExecutionDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Comments": {
+            "type": "string"
+          },
+          "TotalWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "TotalNetValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "TotalGrossValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "TaxValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "CurrencyName": {
+            "type": "string"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderModelItem"
+            }
+          },
+          "WarningMessages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WarningMessage"
+            }
+          }
+        }
+      },
+      "OrderModelItem": {
+        "type": "object",
+        "properties": {
+          "Product": {
+            "$ref": "#/components/schemas/ProductModel"
+          },
+          "Price": {
+            "type": "number",
+            "format": "double"
+          },
+          "TaxRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "PiecesOrdered": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "PiecesReceived": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ItemNetValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "ItemWeight": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ProductModel": {
+        "type": "object",
+        "properties": {
+          "ProductId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "BaseProductId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Index": {
+            "type": "string"
+          },
+          "ProductFullName": {
+            "type": "string"
+          },
+          "EanBarcode": {
+            "type": "string"
+          },
+          "MultiPackEanBarcode": {
+            "type": "string"
+          },
+          "SinglePackQuantityInPieces": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MultiPackQuantityInPieces": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "QuantityLimitLevel1": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "QuantityLimitLevel2": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "PictureUrl": {
+            "type": "string"
+          },
+          "MainPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "YourMainPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "YourPriceLevel1": {
+            "type": "number",
+            "format": "double"
+          },
+          "YourPriceLevel2": {
+            "type": "number",
+            "format": "double"
+          },
+          "CurrencyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CurrencyName": {
+            "type": "string"
+          },
+          "PiecesInStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "OtherPossibleQuantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NearestDilivery": {
+            "type": "string"
+          },
+          "YourIndex": {
+            "type": "string"
+          },
+          "YourProductFullName": {
+            "type": "string"
+          },
+          "YourEanBarcode": {
+            "type": "string"
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "BoxWeight": {
+            "type": "number",
+            "format": "double"
+          },
+          "TaxRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "CountryOfOrigin": {
+            "type": "string"
+          },
+          "IsDeviation": {
+            "type": "boolean"
+          },
+          "Deviation": {
+            "type": "string"
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TagModel"
+            }
+          },
+          "CustomTags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomTagModel"
+            }
+          },
+          "CategoryMapping": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "Message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ShippingAddressModel": {
+        "type": "object",
+        "properties": {
+          "ShippingAddressId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FiendlyName": {
+            "type": "string"
+          },
+          "PostalCode": {
+            "type": "string"
+          },
+          "Street": {
+            "type": "string"
+          },
+          "BuildingNumber": {
+            "type": "string"
+          },
+          "City": {
+            "type": "string"
+          },
+          "CountryCode": {
+            "type": "string"
+          },
+          "ContactPhone": {
+            "type": "string"
+          },
+          "ContactPerson": {
+            "type": "string"
+          },
+          "ReceivingCompanyName": {
+            "type": "string"
+          },
+          "Message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "TagModel": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Value": {
+            "type": "string"
+          }
+        }
+      },
+      "WarningMessage": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ProductId": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "Comment": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Access token from https://identityserver.argip.com.pl/connect/token (client_credentials, scope argipapi).",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Categories"
+    },
+    {
+      "name": "Customer"
+    },
+    {
+      "name": "CustomerParts"
+    },
+    {
+      "name": "Orders"
+    },
+    {
+      "name": "Products"
+    },
+    {
+      "name": "ShippingAddresses"
+    }
+  ]
+}

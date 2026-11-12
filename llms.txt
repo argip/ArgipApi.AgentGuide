@@ -1,0 +1,29 @@
+# Argip API
+
+> Guide for AI agents and developers building integrations with the Argip Client API: a REST API with OAuth 2.0 client credentials for browsing products, stock and prices, calculating and placing orders. Read AGENTS.md first: it holds the mandatory rules.
+
+## Docs
+
+- [AGENTS.md](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/AGENTS.md): what the API is, mandatory rules, documentation map
+- [Authentication](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/authentication.md): token request, caching, refresh, token errors
+- [Endpoints and models](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/endpoints.md): all routes and every model field
+- [Products](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/products.md): listing, paging, EAN and own index, categories
+- [Quantities and prices](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/quantities-and-prices.md): pieces, packages, price levels, VAT
+- [Orders](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/orders.md): Calculate, Save, warning types 1-5, test mode
+- [Customer data](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/customer-data.md): account info, testing phase, shipping addresses, customer parts
+- [Errors](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/errors.md): status codes, the empty 404, retry advice
+- [Recipes](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/docs/recipes.md): catalogue sync, CSV order import, price by EAN
+- [OpenAPI contract](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/openapi.json): machine-readable schema (OpenAPI 3.1)
+
+## Examples
+
+- [Examples overview](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/examples.md): clients in four languages
+- [C#](https://github.com/argip/ArgipApi.Examples.CSharp)
+- [Python](https://github.com/argip/ArgipApi.Examples.Python)
+- [PHP](https://github.com/argip/ArgipApi.Examples.Php)
+- [TypeScript](https://github.com/argip/ArgipApi.Examples.TypeScript)
+
+## Optional
+
+- [Agent skill](https://raw.githubusercontent.com/argip/ArgipApi.AgentGuide/master/skills/argip-api/SKILL.md): checklist for Claude Code and compatible agents
+- [Swagger UI](https://argipapi.argip.com.pl/swagger/ui/index.html): interactive reference
